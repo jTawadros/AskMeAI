@@ -1,6 +1,7 @@
 from openai import OpenAI
 import sys
 import os
+import re
 client = OpenAI()
 
 
@@ -11,6 +12,8 @@ def messageAI(user_input):
 
     system_prompt = (
         "You are a helpful assistant that provides short, direct responses about terminal commands.\n"
+        "If user asks about something other than terminal commands answer in short direct responses\n"
+        "Keep responses to one sentence whenever possible\n"
         f"The user's current directory is {current_dir}.\n"
         f"The files that are in this directory are {dir_contents}"
     )
@@ -27,7 +30,9 @@ def messageAI(user_input):
         model="gpt-4o-mini",
         messages=_messages
     )
-    print(completion.choices[0].message.content)
+
+    clean_text = re.sub(r"'''(.*?)'''", "", completion.choices[0].message.content, flags=re.DOTALL).strip()
+    print(clean_text)
 
 
 def main(arg1):
